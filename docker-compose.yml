@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./rm_paper_system
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./rm_paper_system/src/database:/app/src/database
+    environment:
+      - FLASK_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/dashboard"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build: ./rm-paper-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:5001/api
+    restart: unless-stopped
+
+volumes:
+  database_data:
+
